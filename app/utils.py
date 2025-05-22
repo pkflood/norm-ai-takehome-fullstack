@@ -160,7 +160,10 @@ class DocumentService:
 
         return docs
 
-
+#Vector Store for document embeddings and retrieval
+#connect method sets up an in memory qdrant vector store, using openai gpt4 for the embedding model
+#load adds docs to the vector store
+#k is the number of vectors to return based on semantic similarity
 class QdrantService:
     def __init__(self, k: int = 2):
         self.index = None
