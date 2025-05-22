@@ -32,3 +32,8 @@ async def startup():
     else:
         print(f"Warning: PDF file not found at {PDF_PATH}")
 
+@app.get("/query")
+async def query(query: str = Query(..., description="The query string")):
+    # Process query through the QdrantService
+    output = qdrant_service.query(query)
+    return output
