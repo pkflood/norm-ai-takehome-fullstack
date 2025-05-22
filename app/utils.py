@@ -66,15 +66,13 @@ class QdrantService:
                 
         vstore = QdrantVectorStore(client=client, collection_name='temp')
 
-        service_context = ServiceContext.from_defaults(
-            embed_model=OpenAIEmbedding(),
-            llm=OpenAI(api_key=key, model="gpt-4")
-            )
+        Settings.llm = OpenAI(api_key=key, model="gpt-4")
+        Settings.embed_model = OpenAIEmbedding()
 
         self.index = VectorStoreIndex.from_vector_store(
-            vector_store=vstore, 
-            service_context=service_context
-            )
+            vector_store=vstore,
+            embed_model=Settings.embed_model
+        )
 
     def load(self, docs = list[Document]):
         self.index.insert_nodes(docs)
