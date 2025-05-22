@@ -104,6 +104,35 @@ class QdrantService:
         return output
 
         """
+        from llama_index.core.query_engine import CitationQueryEngine
+
+        # initialize the citation query engine with top k similarity results
+        query_engine = CitationQueryEngine.from_args(
+            self.index,
+            similarity_top_k=self.k,
+            # Include citations in the response, am assuming standard chunk size of 1024 but can adjust for more precision.
+            citation_chunk_size=1024
+        )
+
+        # Get query response
+        response = query_engine.query(query_str)
+
+        # extract citations from the response
+        source_nodes = response.source_nodes
+        citations = []
+        for node in source_nodes:
+            source = node.metadata.get("Section", "")
+            text = node.text
+            citations.append(Citation(source=source, text=text))
+
+        # create output
+        output = Output(
+            query=query_str,
+            response=str(response),
+            citations=citations
+        )
+
+        return output
        
 
 if __name__ == "__main__":
