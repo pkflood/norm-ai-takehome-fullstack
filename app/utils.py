@@ -70,6 +70,26 @@ class DocumentService:
             if text:
                 full_text += text + "\n"
 
+        # Define heading patterns
+        heading_patterns = [
+            '''
+            r"(?m)^#+\s+(.+)$",                   # Markdown headings
+            r"(?m)^Chapter\s+\d+[.:]\s*(.+)$",    # Chapter headings
+            r"(?m)^Section\s+[\d\.]+[.:]\s*(.+)$", # Section headings
+            r"(?m)^[A-Z][A-Z\s]{3,30}$",          # ALL CAPS headings (likely titles)
+            r"(?m)^[IVX]+\.\s+(.+)$",             # Roman numeral headings
+    
+            '''
+    
+            r"(?m)^\d+\.\s+(.+)$",  # Simple numbered lists (e.g., 1. Introduction)
+            r"(?m)^\d+\.\d+\s+(.+)$",  # Decimal numbered points (e.g., 1.1, 2.3)
+            r"(?m)^(\d+\.){2,}\d+\s+(.+)$"  # Multi-level numbering (e.g., 1.1.2, 2.3.4.5)
+        ]
+
+        # Combine all patterns
+        combined_pattern = "|".join(f"({pattern})" for pattern in heading_patterns)
+
+
 class QdrantService:
     def __init__(self, k: int = 2):
         self.index = None
