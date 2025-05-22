@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 import qdrant_client
 import pypdf
+import re
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms.openai import OpenAI
