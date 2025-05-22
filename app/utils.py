@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 import qdrant_client
+import pypdf
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms.openai import OpenAI
@@ -55,6 +56,19 @@ class DocumentService:
         return docs
 
      """
+
+    docs = []
+
+    # Open and read the PDF file
+    with open(file_path, "rb") as file:
+        pdf_reader = pypdf.PdfReader(file)
+
+        # First, extract all text from the PDF
+        full_text = ""
+        for page in pdf_reader.pages:
+            text = page.extract_text()
+            if text:
+                full_text += text + "\n"
 
 class QdrantService:
     def __init__(self, k: int = 2):
