@@ -89,7 +89,7 @@ class DocumentService:
 
         try:
             # # Load the PDF and get the raw text
-            print(f"📖 Loading PDF: {file_path}")
+            print(f"Loading PDF: {file_path}")
             # pages = SimpleDirectoryReader(input_files=[file_path]).load_data()
             #
             #
@@ -107,7 +107,7 @@ class DocumentService:
             print(text)
 
             # Split by law sections to create one document per major law
-            print("✂️ Splitting into law sections...")
+            print("Splitting into law sections...")
             laws = self._split_into_laws(text)
 
             laws.pop(0) #remove title of page from list of laws
@@ -115,8 +115,7 @@ class DocumentService:
             documents = []
 
             # Creating document with metadata={"Section": "Law #"} and text is law text for each major number law
-            # Possible improvement with more time would be to correct the spacing and general format for the text; was tricky because pdf parsing removes formatting and spaces.
-            # Could do this either with advanced regex/parsing functions or llm call on the text following extraction.
+            # Could do this either with advanced regex/parsing functions or llm call on the text following extraction, used regex for now
             print(len(laws))
             for index, law in enumerate(laws):
                 law = law.replace('\n', ' ')
@@ -125,12 +124,12 @@ class DocumentService:
                 print(document)
                 documents.append(document)
 
-            print(f"✅ Successfully created {len(documents)} law documents")
+            print(f"Successfully created {len(documents)} law documents")
             # return law_documents
             return documents
 
         except Exception as e:
-            print(f"❌ Error processing PDF: {e}")
+            print(f"Error processing PDF: {e}")
             return []
 
 
