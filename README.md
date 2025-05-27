@@ -16,11 +16,11 @@ Run the following command, where myapp is the name of the image you choose, to b
 
     docker build -t myapp:latest .
 ### 2. Run Docker container from the image: 
-Pass in your own openai api key, choose a name for the container (in this case norm-takehome), and use the same image name as step 1. 
+Pass in your own openai api key, choose a name for the container (in this case norm-takehome), and use the same image name as in step 1. 
 
     docker run -e OPENAI_API_KEY="" -d -p 8080:80 --name norm-takehome myapp:latest
 ### 3. Verify the image is running
-The first command will show you whether or not the container is running or has exited, along with the container name and id. Run "docker logs" with the container id from the previous command to view the details of the app launch. 
+The first command will show you whether or not the container is running or has exited along with the container name and id. Run "docker logs" with the container id from the previous command to view the details of the app launch. 
 
     docker ps -a
     docker logs <container id>
