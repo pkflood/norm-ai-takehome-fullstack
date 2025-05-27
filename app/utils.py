@@ -21,6 +21,9 @@ from llama_index.core.schema import Document
 from llama_index.core.node_parser import SentenceSplitter, SimpleNodeParser
 from typing import List
 
+import fitz
+
+
 
 key = os.environ['OPENAI_API_KEY']
 
@@ -85,32 +88,41 @@ class DocumentService:
             raise FileNotFoundError(f"File not found: {file_path}")
 
         try:
-            # Load the PDF and get the raw text
+            # # Load the PDF and get the raw text
             print(f"📖 Loading PDF: {file_path}")
-            pages = SimpleDirectoryReader(input_files=[file_path]).load_data()
+            # pages = SimpleDirectoryReader(input_files=[file_path]).load_data()
+            #
+            #
+            # # Combine all pages into one text block
+            # full_text = ""
+            # for page in pages:
+            #     full_text += page.text + "\n"
+            # print(full_text)
 
-
-            # Combine all pages into one text block
-            full_text = ""
-            for page in pages:
-                full_text += page.text + "\n"
-            print(full_text)
+            doc = fitz.open(file_path)
+            text = ""
+            for page in doc:
+                text += page.get_text("text")  # use "text" mode to retain layout
+            print("testing new pdf package")
+            print(text)
 
             # Split by law sections to create one document per major law
             print("✂️ Splitting into law sections...")
-            laws = self._split_into_laws(full_text)
+            laws = self._split_into_laws(text)
 
             laws.pop(0) #remove title of page from list of laws
-            print(laws)
 
             documents = []
 
             # Creating document with metadata={"Section": "Law #"} and text is law text for each major number law
             # Possible improvement with more time would be to correct the spacing and general format for the text; was tricky because pdf parsing removes formatting and spaces.
             # Could do this either with advanced regex/parsing functions or llm call on the text following extraction.
+            print(len(laws))
             for index, law in enumerate(laws):
+                law = law.replace('\n', ' ')
                 metadata = {"Section": f"Law {index + 1}"}
                 document = Document(metadata=metadata, text=law)
+                print(document)
                 documents.append(document)
 
             print(f"✅ Successfully created {len(documents)} law documents")
@@ -128,11 +140,23 @@ class DocumentService:
         Assuming laws will be listed in a numeric list with a digit followed by a colon.
         """
         # Split by main numbered sections (1., 2., 3., etc.)
-        pattern = r'(?<!\d\.)\d+\. '
+        # This way response mentions the major law number and the text includes all subsequent parts of that law. Could also configure to provide the exact law subpoint
+        # as the citation but that might be too granular for some cases and would exclude some crucial other parts of the general law depending on k value.
+
+        # old regex process for llama parser
+        #pattern = r'(?<!\d\.)\d+\. '
+        # Remove empty sections and clean up
+        #laws = [law.strip() for law in laws if law.strip()]
+
+        #new process for new parser to preserve spacing in citation
+        pattern = r'(?<=\n)(\d+)\.\n'
         laws = re.split(pattern, text)
 
-        # Remove empty sections and clean up
-        laws = [law.strip() for law in laws if law.strip()]
+        #size is number of laws (laws is originally twice the length of # laws because one law element for number, then also one for text)
+        size = len(laws)//2
+
+        #delete just number law elements (digit length will always be less than or equal to
+        laws = [law.strip() for law in laws if len(law) > len(str(abs(size)))]
 
         return laws
 
